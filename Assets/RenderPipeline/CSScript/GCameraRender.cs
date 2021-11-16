@@ -18,11 +18,11 @@ public class GCameraRender
 
     public void Render()
     {
+        m_context.SetupCameraProperties(m_camera);
         m_buffer.ClearRenderTarget(true, true, Color.red);
         m_buffer.BeginSample(m_bufferName);
         this.ExecuteBuffer();
 
-        m_context.SetupCameraProperties(m_camera);
         m_context.DrawSkybox(m_camera);
         
         m_buffer.EndSample(m_bufferName);
