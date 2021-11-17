@@ -24,7 +24,7 @@ public partial class GCameraRender
 
         PrepareBuffer();
         m_context.SetupCameraProperties(m_camera);
-        m_buffer.ClearRenderTarget(true, true, Color.clear);
+        this.ClearRenderTarget();
         m_buffer.BeginSample(m_sampleName);
         this.ExecuteBuffer();
 
@@ -36,6 +36,26 @@ public partial class GCameraRender
         this.ExecuteBuffer();
 
         m_context.Submit();
+    }
+
+    private void ClearRenderTarget()
+    {
+        bool clearDepth = true;
+        CameraClearFlags flags = m_camera.clearFlags;
+        if( flags == CameraClearFlags.Nothing)
+        {
+            clearDepth = false;
+        }
+
+        bool clearColor = false;
+        Color color = Color.clear;
+        if( flags == CameraClearFlags.Color)
+        {
+            clearColor = true;
+            color = m_camera.backgroundColor.linear;
+        }
+        
+        m_buffer.ClearRenderTarget(clearDepth, clearColor, color);
     }
 
     private void ExecuteBuffer()
