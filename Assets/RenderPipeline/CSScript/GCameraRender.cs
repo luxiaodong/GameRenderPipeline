@@ -27,8 +27,7 @@ public class GCameraRender
         m_buffer.BeginSample(m_bufferName);
         this.ExecuteBuffer();
 
-        this.DrawOpaqueObject();
-        m_context.DrawSkybox(m_camera);
+        this.DrawObject();
 
         m_buffer.EndSample(m_bufferName);
         this.ExecuteBuffer();
@@ -53,12 +52,18 @@ public class GCameraRender
         return false;
     }
 
-    private void DrawOpaqueObject()
+    private void DrawObject()
     {
         var sortingSetting = new SortingSettings(m_camera){criteria = SortingCriteria.CommonOpaque};
         var drawingSetting = new DrawingSettings(m_unlitShaderTagId, sortingSetting);
         var filteringSetting = new FilteringSettings(RenderQueueRange.opaque);
         m_context.DrawRenderers(m_cullingResult, ref drawingSetting, ref filteringSetting);
-    }
 
+        m_context.DrawSkybox(m_camera);
+
+        sortingSetting.criteria = SortingCriteria.CommonTransparent;
+        drawingSetting.sortingSettings = sortingSetting;
+        filteringSetting.renderQueueRange = RenderQueueRange.transparent;
+        m_context.DrawRenderers(m_cullingResult, ref drawingSetting, ref filteringSetting);
+    }
 }
