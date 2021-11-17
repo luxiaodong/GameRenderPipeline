@@ -11,6 +11,14 @@ public class GCameraRender
     CommandBuffer m_buffer = new CommandBuffer{name = m_bufferName};
     CullingResults m_cullingResult;
     static ShaderTagId m_unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
+    static ShaderTagId[] m_legacyShaderTagIds = {
+        new ShaderTagId("Always"),
+		new ShaderTagId("ForwardBase"),
+		new ShaderTagId("PrepassBase"),
+		new ShaderTagId("Vertex"),
+		new ShaderTagId("VertexLMRGBM"),
+		new ShaderTagId("VertexLM")
+    };
 
     public void Init(ScriptableRenderContext context, Camera camera)
     {
@@ -28,6 +36,7 @@ public class GCameraRender
         this.ExecuteBuffer();
 
         this.DrawObject();
+        this.DrawUnsupportedShaders();
 
         m_buffer.EndSample(m_bufferName);
         this.ExecuteBuffer();
@@ -66,4 +75,16 @@ public class GCameraRender
         filteringSetting.renderQueueRange = RenderQueueRange.transparent;
         m_context.DrawRenderers(m_cullingResult, ref drawingSetting, ref filteringSetting);
     }
+
+    private void DrawUnsupportedShaders()
+    {
+        var drawingSettings = new DrawingSettings(m_legacyShaderTagIds[0], new SortingSettings(m_camera));
+        for(int i=1; i<m_legacyShaderTagIds.Length; i++)
+        {
+            drawingSettings.SetShaderPassName(i, m_legacyShaderTagIds[i]);
+        }
+		var filteringSettings = FilteringSettings.defaultValue;
+		m_context.DrawRenderers(m_cullingResult, ref drawingSettings, ref filteringSettings);
+    }
+
 }
