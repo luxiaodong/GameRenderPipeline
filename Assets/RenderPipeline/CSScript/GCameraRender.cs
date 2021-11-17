@@ -7,8 +7,8 @@ public partial class GCameraRender
 {
     Camera m_camera;
     ScriptableRenderContext m_context;
-    const string m_bufferName = "Render Camera";
-    CommandBuffer m_buffer = new CommandBuffer{name = m_bufferName};
+    CommandBuffer m_buffer = new CommandBuffer{name = "Render Camera"};
+    string m_sampleName = "";
     CullingResults m_cullingResult;
     static ShaderTagId m_unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
 
@@ -22,15 +22,17 @@ public partial class GCameraRender
     {
         if( Cull() == false ) return ;
 
+        PrepareBuffer();
         m_context.SetupCameraProperties(m_camera);
         m_buffer.ClearRenderTarget(true, true, Color.clear);
-        m_buffer.BeginSample(m_bufferName);
+        m_buffer.BeginSample(m_sampleName);
         this.ExecuteBuffer();
 
         this.DrawObject();
         this.DrawUnsupportedShaders();
+        this.DrawGizmos();
 
-        m_buffer.EndSample(m_bufferName);
+        m_buffer.EndSample(m_sampleName);
         this.ExecuteBuffer();
 
         m_context.Submit();

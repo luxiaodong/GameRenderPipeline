@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Profiling;
 
 partial class GCameraRender
 {
     partial void DrawUnsupportedShaders();
+    partial void DrawGizmos();
+    partial void PrepareBuffer();
 
 #if UNITY_EDITOR
     static ShaderTagId[] m_legacyShaderTagIds = {
@@ -37,6 +41,23 @@ partial class GCameraRender
 		var filteringSettings = FilteringSettings.defaultValue;
 		m_context.DrawRenderers(m_cullingResult, ref drawingSettings, ref filteringSettings);
     }
+
+    partial void DrawGizmos()
+    {
+        if (Handles.ShouldRenderGizmos()) {
+			m_context.DrawGizmos(m_camera, GizmoSubset.PreImageEffects);
+			m_context.DrawGizmos(m_camera, GizmoSubset.PostImageEffects);
+		}
+    }
+
+    partial void PrepareBuffer()
+    {
+        // Profiler.BeginSample("Editor Only");
+        m_buffer.name = m_camera.name;
+        m_sampleName = m_camera.name;
+        // Profiler.EndSample();
+    }
+
 #endif
 
 }
