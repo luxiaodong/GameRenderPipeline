@@ -22,7 +22,7 @@
             #include "../Library/Common.hlsl"
             
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
-            float4 _BaseMap_ST;
+            float4 _MainTex_ST;
 
             struct a2v
             {
@@ -40,7 +40,7 @@
             {
                 v2f o;
                 o.positionCS = TransformObjectToHClip(i.positionOS);
-                o.uv = i.uv * _BaseMap_ST.xy + _BaseMap_ST.zw;
+                o.uv = i.uv * _MainTex_ST.xy + _MainTex_ST.zw;
                 return o;
             }
 
