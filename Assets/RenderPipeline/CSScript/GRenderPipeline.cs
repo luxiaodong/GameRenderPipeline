@@ -9,7 +9,7 @@ public class GRenderPipeline : RenderPipeline
 
     public GRenderPipeline()
     {
-        // GraphicsSettings.useScriptableRenderPipelineBatching = true;
+        GraphicsSettings.useScriptableRenderPipelineBatching = true;
     }
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
