@@ -10,7 +10,7 @@ public class GRenderPipeline : RenderPipeline
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
     {
         SortCameras(cameras);
-        Debug.Log(cameras.Length);
+        // Debug.Log(cameras.Length);
         foreach(Camera camera in cameras)
         {
             m_cameraRender.Init(context, camera);
