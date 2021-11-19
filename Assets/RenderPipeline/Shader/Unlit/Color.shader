@@ -2,7 +2,7 @@
 {
     Properties
     {
-        _MainColor ("Color", Color) = (1, 1, 1, 1)
+        _BaseColor ("Color", Color) = (1, 1, 1, 1)
     }
 
     SubShader
@@ -18,8 +18,10 @@
 
             #include "../Library/Common.hlsl"
 
-            float4 _MainColor;
-            
+            CBUFFER_START(UnityPerMaterial)
+                float4 _BaseColor;
+            CBUFFER_END
+
             float4 vert(float3 positionOS : POSITION) : SV_POSITION
             {
                 return TransformObjectToHClip(positionOS);
@@ -27,7 +29,7 @@
 
             float4 frag() : SV_TARGET
             {
-                return _MainColor;
+                return _BaseColor;
             }
 
             ENDHLSL

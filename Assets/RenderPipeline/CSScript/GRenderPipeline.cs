@@ -7,6 +7,11 @@ public class GRenderPipeline : RenderPipeline
 {
     GCameraRender m_cameraRender = new GCameraRender();
 
+    public GRenderPipeline()
+    {
+        // GraphicsSettings.useScriptableRenderPipelineBatching = true;
+    }
+
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
     {
         SortCameras(cameras);

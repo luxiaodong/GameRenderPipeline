@@ -22,7 +22,10 @@
             #include "../Library/Common.hlsl"
             
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
-            float4 _MainTex_ST;
+
+            CBUFFER_START(UnityPerMaterial)
+                float4 _MainTex_ST;
+            CBUFFER_END
 
             struct a2v
             {
