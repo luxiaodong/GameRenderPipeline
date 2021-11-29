@@ -4,8 +4,12 @@ using UnityEngine.Rendering;
 [CreateAssetMenu(menuName="Rendering/Game Render Pipeline")]
 public class GRenderPipelineAsset : RenderPipelineAsset
 {
+    public bool m_enableDynamicBatching = true;
+    public bool m_enableGPUInstance = true;
+    public bool m_enableSRPBatcher = true;
+
     protected override RenderPipeline CreatePipeline()
     {
-        return new GRenderPipeline();
+        return new GRenderPipeline(m_enableDynamicBatching, m_enableGPUInstance, m_enableSRPBatcher);
     }
 }

@@ -18,7 +18,7 @@ public partial class GCameraRender
         this.m_context = context;
     }
 
-    public void Render()
+    public void Render(bool useDynamicBatching, bool useGPUInstance)
     {
         if( Cull() == false ) return ;
 
@@ -28,7 +28,7 @@ public partial class GCameraRender
         m_buffer.BeginSample(m_sampleName);
         this.ExecuteBuffer();
 
-        this.DrawObject();
+        this.DrawObject(useDynamicBatching, useGPUInstance);
         this.DrawUnsupportedShaders();
         this.DrawGizmos();
 
@@ -75,10 +75,13 @@ public partial class GCameraRender
         return false;
     }
 
-    private void DrawObject()
+    private void DrawObject(bool useDynamicBatching, bool useGPUInstance)
     {
         var sortingSetting = new SortingSettings(m_camera){criteria = SortingCriteria.CommonOpaque};
-        var drawingSetting = new DrawingSettings(m_unlitShaderTagId, sortingSetting);
+        var drawingSetting = new DrawingSettings(m_unlitShaderTagId, sortingSetting){
+            enableDynamicBatching = useDynamicBatching,
+            enableInstancing = useGPUInstance
+        };
         var filteringSetting = new FilteringSettings(RenderQueueRange.opaque);
         m_context.DrawRenderers(m_cullingResult, ref drawingSetting, ref filteringSetting);
 
