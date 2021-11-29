@@ -11,6 +11,7 @@ public partial class GCameraRender
     string m_sampleName = "";
     CullingResults m_cullingResult;
     static ShaderTagId m_unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
+    static ShaderTagId m_litShaderTagId = new ShaderTagId("LitSimple"); //自定义Lit
 
     public void Init(ScriptableRenderContext context, Camera camera)
     {
@@ -82,6 +83,7 @@ public partial class GCameraRender
             enableDynamicBatching = useDynamicBatching,
             enableInstancing = useGPUInstance
         };
+        drawingSetting.SetShaderPassName(1, m_litShaderTagId);
         var filteringSetting = new FilteringSettings(RenderQueueRange.opaque);
         m_context.DrawRenderers(m_cullingResult, ref drawingSetting, ref filteringSetting);
 

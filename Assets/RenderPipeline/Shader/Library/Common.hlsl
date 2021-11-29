@@ -1,5 +1,5 @@
-﻿#ifndef GAME_RENDER_PIPELINE
-#define GAME_RENDER_PIPELINE
+﻿#ifndef GAME_RENDER_PIPELINE_COMMON
+#define GAME_RENDER_PIPELINE_COMMON
 
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 
