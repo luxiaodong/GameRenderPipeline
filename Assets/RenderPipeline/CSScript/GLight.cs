@@ -15,6 +15,7 @@ public class GLight
     public void Init(ScriptableRenderContext context)
     {
         // m_context = context;
+        m_buffer.Clear();
         m_buffer.BeginSample(m_bufferName);
         SetDirectionalLight();
         m_buffer.EndSample(m_bufferName);
@@ -25,7 +26,7 @@ public class GLight
     void SetDirectionalLight()
     {
         Light light = RenderSettings.sun;
-        m_buffer.SetGlobalVector(m_directionalLightColorPropertyId, light.color);
+        m_buffer.SetGlobalVector(m_directionalLightColorPropertyId, light.color.linear * light.intensity );
         m_buffer.SetGlobalVector(m_directionalLightDirectionPropertyId, -light.transform.forward);
     }
 
