@@ -11,12 +11,14 @@ public partial class GCameraRender
     string m_sampleName = "";
     CullingResults m_cullingResult;
     static ShaderTagId m_unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
+
+    GLight m_light = new GLight();
     static ShaderTagId m_litShaderTagId = new ShaderTagId("LitSimple"); //自定义Lit
 
     public void Init(ScriptableRenderContext context, Camera camera)
     {
-        this.m_camera = camera;
-        this.m_context = context;
+        m_camera = camera;
+        m_context = context;
     }
 
     public void Render(bool useDynamicBatching, bool useGPUInstance)
@@ -25,16 +27,17 @@ public partial class GCameraRender
 
         PrepareBuffer();
         m_context.SetupCameraProperties(m_camera);
-        this.ClearRenderTarget();
+        ClearRenderTarget();
         m_buffer.BeginSample(m_sampleName);
-        this.ExecuteBuffer();
+        ExecuteBuffer();
 
-        this.DrawObject(useDynamicBatching, useGPUInstance);
-        this.DrawUnsupportedShaders();
-        this.DrawGizmos();
+        m_light.Init(m_context);
+        DrawObject(useDynamicBatching, useGPUInstance);
+        DrawUnsupportedShaders();
+        DrawGizmos();
 
         m_buffer.EndSample(m_sampleName);
-        this.ExecuteBuffer();
+        ExecuteBuffer();
 
         m_context.Submit();
     }
