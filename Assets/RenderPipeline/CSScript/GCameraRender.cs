@@ -31,7 +31,7 @@ public partial class GCameraRender
         m_buffer.BeginSample(m_sampleName);
         ExecuteBuffer();
 
-        m_light.Init(m_context);
+        m_light.Init(m_context, m_cullingResult);
         DrawObject(useDynamicBatching, useGPUInstance);
         DrawUnsupportedShaders();
         DrawGizmos();
