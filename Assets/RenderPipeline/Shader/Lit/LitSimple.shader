@@ -80,8 +80,16 @@
 		        clip(surface.alpha - cutOff);
             #endif
 
-                Light light = GetTestLight();
-                float3 color = lambert(light, surface);
+                // Light light = GetTestLight();
+                // float3 color = lambert(light, surface);
+
+                float3 color = float3(0,0,0);
+                for(int i=0; i < GetDirectionalLightCount(); ++i)
+                {
+                    Light light = GetDirectionalLight(i);
+                    color += lambert(light, surface);
+                }
+
                 return float4(color, surface.alpha);
             }
 

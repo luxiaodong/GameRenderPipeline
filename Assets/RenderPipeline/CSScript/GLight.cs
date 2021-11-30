@@ -2,16 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering; 
+using Unity.Collections;
 
 public class GLight
 {
     // ScriptableRenderContext m_context;
     const string m_bufferName = "Lighting";
     CommandBuffer m_buffer = new CommandBuffer{name = m_bufferName};
-
-    static int m_directionalLightColorPropertyId = Shader.PropertyToID("_DirectionalLightColor");
-    static int m_directionalLightDirectionPropertyId = Shader.PropertyToID("_DirectionalLightDirection");
     CullingResults m_cullingResults;
+
+    static int m_directionalLightCountPropertyId = Shader.PropertyToID("_DirectionalLightCount");
+    static int m_directionalLightColorPropertyId = Shader.PropertyToID("_DirectionalLightColors");
+    static int m_directionalLightDirectionPropertyId = Shader.PropertyToID("_DirectionalLightDirections");
+
+    const int m_maxDirectionalLightCount = 4;
+    static Vector4[] m_directionalLightColors = new Vector4[m_maxDirectionalLightCount];
+    static Vector4[] m_directionalLightDirections = new Vector4[m_maxDirectionalLightCount];
 
     public void Init(ScriptableRenderContext context, CullingResults cullingResult)
     {
@@ -19,7 +25,7 @@ public class GLight
         m_cullingResults = cullingResult;
         m_buffer.Clear();
         m_buffer.BeginSample(m_bufferName);
-        //SetDirectionalLight();
+        // SetDirectionalLight();
         SetLight();
         m_buffer.EndSample(m_bufferName);
         context.ExecuteCommandBuffer(m_buffer);
@@ -29,21 +35,32 @@ public class GLight
     void SetLight()
     {
         NativeArray<VisibleLight> visibleLights = m_cullingResults.visibleLights;
+        int directionalIndex = 0;
         for (int i = 0; i < visibleLights.Length; i++) 
         {
             VisibleLight visibleLight = visibleLights[i];
             if(visibleLight.lightType == LightType.Directional)
             {
-                SetDirectionalLight(visibleLight);
+                SetDirectionalLight(directionalIndex, ref visibleLight);
+                directionalIndex++;
+
+                if(directionalIndex == m_maxDirectionalLightCount)
+                {
+                    break;
+                }
             }
         }
+
+        m_buffer.SetGlobalInt(m_directionalLightCountPropertyId, directionalIndex);
+        m_buffer.SetGlobalVectorArray(m_directionalLightColorPropertyId, m_directionalLightColors);
+        m_buffer.SetGlobalVectorArray(m_directionalLightDirectionPropertyId, m_directionalLightDirections);
     }
 
-    void SetDirectionalLight(VisibleLight visibleLight)
+    void SetDirectionalLight(int index, ref VisibleLight visibleLight)
     {
         Light light = visibleLight.light;
-        m_buffer.SetGlobalVector(m_directionalLightColorPropertyId, light.color.linear * light.intensity );
-        m_buffer.SetGlobalVector(m_directionalLightDirectionPropertyId, -light.transform.forward);
+        m_directionalLightColors[index] = light.color.linear * light.intensity;
+        m_directionalLightDirections[index] = -light.transform.forward;
     }
 
 }
