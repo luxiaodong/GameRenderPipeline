@@ -94,8 +94,13 @@
                 inputData.normalWS = i.normalWS;
                 inputData.viewDirectionWS = i.viewDirectionWS;
 
-                float3 color = 0.0f;
-                color += brdf_direct(GetMainLight(), surfaceData, inputData);
+                float3 color = float3(0,0,0);
+                for(int i=0; i < GetDirectionalLightCount(); ++i)
+                {
+                    Light light = GetDirectionalLight(i);
+                    color += brdf_direct(light, surfaceData, inputData);
+                }
+
                 return float4(color, surfaceData.alpha);
             }
 
