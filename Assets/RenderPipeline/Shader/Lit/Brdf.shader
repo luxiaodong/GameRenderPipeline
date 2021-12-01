@@ -7,11 +7,11 @@
         _Smoothness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
 
-        // _CutOff ("Alpha Cutoff", Range(0,1)) = 0.5
-        // [Toggle(_CLIPPING)] _Clipping ("Alpha Clipping", Float) = 0
-        // [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Src Blend", Float) = 1
-		// [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Dst Blend", Float) = 0
-        // [Enum(Off,0,On,1)] _ZWrite ("Z Write", float) = 1
+        _CutOff ("Alpha Cutoff", Range(0,1)) = 0.5
+        [Toggle(_CLIPPING)] _Clipping ("Alpha Clipping", Float) = 0
+        [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Src Blend", Float) = 1
+		[Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Dst Blend", Float) = 0
+        [Enum(Off,0,On,1)] _ZWrite ("Z Write", float) = 1
     }
 
     SubShader
@@ -20,8 +20,8 @@
         Pass
         {
             Name "Brdf"
-            // Blend [_SrcBlend] [_DstBlend]
-            // ZWrite [_ZWrite]
+            Blend [_SrcBlend] [_DstBlend]
+            ZWrite [_ZWrite]
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -40,7 +40,7 @@
                 UNITY_DEFINE_INSTANCED_PROP(float4, _MainTex_ST)
                 UNITY_DEFINE_INSTANCED_PROP(float, _Smoothness)
                 UNITY_DEFINE_INSTANCED_PROP(float, _Metallic)
-                // UNITY_DEFINE_INSTANCED_PROP(float, _CutOff)
+                UNITY_DEFINE_INSTANCED_PROP(float, _CutOff)
             UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
             struct a2v
@@ -89,6 +89,11 @@
                 surfaceData.smoothness = smoothness;
                 surfaceData.metallic = metallic;
 
+            #if defined(_CLIPPING)
+                float cutoff = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _CutOff);
+		        clip(surfaceData.alpha - cutoff);
+            #endif
+
                 InputData inputData;
                 inputData.positionWS = i.positionWS;
                 inputData.normalWS = i.normalWS;
@@ -107,4 +112,6 @@
             ENDHLSL
         }
     }
+
+    CustomEditor "CustomShaderGUI"
 }
