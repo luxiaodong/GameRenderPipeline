@@ -9,6 +9,7 @@
 
         _CutOff ("Alpha Cutoff", Range(0,1)) = 0.5
         [Toggle(_CLIPPING)] _Clipping ("Alpha Clipping", Float) = 0
+        [Toggle(_PREMULTIPLY_ALPHA)] _PremulAlpha ("Premultiply Alpha", Float) = 0
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Src Blend", Float) = 1
 		[Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Dst Blend", Float) = 0
         [Enum(Off,0,On,1)] _ZWrite ("Z Write", float) = 1
@@ -28,7 +29,9 @@
             #pragma fragment frag
             #pragma target 3.5
             #pragma multi_compile_instancing
+            
             #pragma shader_feature _CLIPPING
+            #pragma shader_feature _PREMULTIPLY_ALPHA
 
             #include "../Library/Common.hlsl"
             #include "../Library/Lighting.hlsl"
@@ -99,11 +102,16 @@
                 inputData.normalWS = i.normalWS;
                 inputData.viewDirectionWS = i.viewDirectionWS;
 
+                bool preMultiAlpha = false;
+            #if defined(_PREMULTIPLY_ALPHA)
+                preMultiAlpha = true;
+            #endif
+
                 float3 color = float3(0,0,0);
                 for(int i=0; i < GetDirectionalLightCount(); ++i)
                 {
                     Light light = GetDirectionalLight(i);
-                    color += brdf_direct(light, surfaceData, inputData);
+                    color += brdf_direct(light, surfaceData, inputData, preMultiAlpha);
                 }
 
                 return float4(color, surfaceData.alpha);

@@ -14,6 +14,12 @@ public class CustomShaderGUI : ShaderGUI {
 		set => SetProperty("_Clipping", "_CLIPPING", value);
 	}
 
+	bool HasPremultiplyAlpha => HasProperty("_PremulAlpha");
+
+	bool PremultiplyAlpha {
+		set => SetProperty("_PremulAlpha", "_PREMULTIPLY_ALPHA", value);
+	}
+
 	BlendMode SrcBlend {
 		set => SetProperty("_SrcBlend", (float)value);
 	}
@@ -46,8 +52,8 @@ public class CustomShaderGUI : ShaderGUI {
 		showPresets = EditorGUILayout.Foldout(showPresets, "Presets", true);
 		if (showPresets) {
 			OpaquePreset();
-			FadePreset();
 			ClipPreset();
+			FadePreset();
 			TransparentPreset();
 		}
 	}
@@ -55,6 +61,7 @@ public class CustomShaderGUI : ShaderGUI {
 	void OpaquePreset () {
 		if (PresetButton("Opaque")) {
 			Clipping = false;
+			PremultiplyAlpha = false;
 			SrcBlend = BlendMode.One;
 			DstBlend = BlendMode.Zero;
 			ZWrite = true;
@@ -65,6 +72,7 @@ public class CustomShaderGUI : ShaderGUI {
 	void ClipPreset () {
 		if (PresetButton("Clip")) {
 			Clipping = true;
+			PremultiplyAlpha = false;
 			SrcBlend = BlendMode.One;
 			DstBlend = BlendMode.Zero;
 			ZWrite = true;
@@ -75,6 +83,7 @@ public class CustomShaderGUI : ShaderGUI {
 	void FadePreset () {
 		if (PresetButton("Fade")) {
 			Clipping = false;
+			PremultiplyAlpha = false;
 			SrcBlend = BlendMode.SrcAlpha;
 			DstBlend = BlendMode.OneMinusSrcAlpha;
 			ZWrite = false;
@@ -83,8 +92,9 @@ public class CustomShaderGUI : ShaderGUI {
 	}
 
 	void TransparentPreset () {
-		if (PresetButton("Transparent")) {
+		if (HasPremultiplyAlpha && PresetButton("Transparent")) {
 			Clipping = false;
+			PremultiplyAlpha = true;
 			SrcBlend = BlendMode.One;
 			DstBlend = BlendMode.OneMinusSrcAlpha;
 			ZWrite = false;
