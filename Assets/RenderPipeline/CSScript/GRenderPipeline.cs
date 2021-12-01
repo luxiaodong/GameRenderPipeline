@@ -18,6 +18,7 @@ public class GRenderPipeline : RenderPipeline
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
     {
+        SetGlobalShaderConstants();
         SortCameras(cameras);
         // Debug.Log(cameras.Length);
         foreach(Camera camera in cameras)
@@ -35,4 +36,16 @@ public class GRenderPipeline : RenderPipeline
             Array.Sort(cameras, cameraComparison);
         }
     }
+
+    static private int _GlossyEnvironmentColor = Shader.PropertyToID("_GlossyEnvironmentColor");
+
+    void SetGlobalShaderConstants()
+    {
+        // When glossy reflections are OFF in the shader we set a constant color to use as indirect specular
+        SphericalHarmonicsL2 ambientSH = RenderSettings.ambientProbe;
+        Color linearGlossyEnvColor = new Color(ambientSH[0, 0], ambientSH[1, 0], ambientSH[2, 0]) * RenderSettings.reflectionIntensity;
+        Color glossyEnvColor = CoreUtils.ConvertLinearToActiveColorSpace(linearGlossyEnvColor);
+        Shader.SetGlobalVector(_GlossyEnvironmentColor, glossyEnvColor);
+    }
+
 }

@@ -29,11 +29,10 @@
             #pragma fragment frag
             #pragma target 3.5
             #pragma multi_compile_instancing
-            
+
             #pragma shader_feature _CLIPPING
             #pragma shader_feature _PREMULTIPLY_ALPHA
 
-            #include "../Library/Common.hlsl"
             #include "../Library/Lighting.hlsl"
 
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
@@ -91,6 +90,8 @@
                 surfaceData.alpha = texColor.a * baseColor.a;
                 surfaceData.smoothness = smoothness;
                 surfaceData.metallic = metallic;
+                surfaceData.occlusion = 1.0f;
+                surfaceData.emission = float3(0,0,0);
 
             #if defined(_CLIPPING)
                 float cutoff = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _CutOff);
@@ -101,6 +102,7 @@
                 inputData.positionWS = i.positionWS;
                 inputData.normalWS = i.normalWS;
                 inputData.viewDirectionWS = i.viewDirectionWS;
+                inputData.bakedGI = float3(0,0,0);
 
                 bool preMultiAlpha = false;
             #if defined(_PREMULTIPLY_ALPHA)
@@ -112,8 +114,10 @@
                 {
                     Light light = GetDirectionalLight(i);
                     color += brdf_direct(light, surfaceData, inputData, preMultiAlpha);
+                    // color += brdf_indirect(light, surfaceData, inputData);
                 }
 
+                color += surfaceData.emission;
                 return float4(color, surfaceData.alpha);
             }
 
