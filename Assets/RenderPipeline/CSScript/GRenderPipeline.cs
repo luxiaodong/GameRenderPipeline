@@ -8,11 +8,13 @@ public class GRenderPipeline : RenderPipeline
     GCameraRender m_cameraRender = new GCameraRender();
     private bool m_useDynamicBatching = false;
     private bool m_useGPUInstance = false;
+    private ShadowSettings m_shadowSetting;
 
-    public GRenderPipeline(bool useDynamicBatching, bool useGPUInstance, bool useSRPBatcher)
+    public GRenderPipeline(bool useDynamicBatching, bool useGPUInstance, bool useSRPBatcher, ShadowSettings shadowSetting)
     {
         m_useDynamicBatching = useDynamicBatching;
         m_useGPUInstance = useGPUInstance;
+        m_shadowSetting = shadowSetting;
         GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
     }
 
@@ -23,7 +25,7 @@ public class GRenderPipeline : RenderPipeline
         // Debug.Log(cameras.Length);
         foreach(Camera camera in cameras)
         {
-            m_cameraRender.Init(context, camera);
+            m_cameraRender.Init(context, camera, m_shadowSetting);
             m_cameraRender.Render(m_useDynamicBatching, m_useGPUInstance);
         }
     }

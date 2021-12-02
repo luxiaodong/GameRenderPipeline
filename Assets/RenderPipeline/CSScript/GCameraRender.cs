@@ -15,15 +15,18 @@ public partial class GCameraRender
     GLight m_light = new GLight();
     static ShaderTagId m_litShaderTagId = new ShaderTagId("LitSimple"); //自定义Lit
 
-    public void Init(ScriptableRenderContext context, Camera camera)
+    private ShadowSettings m_shadowSetting;
+
+    public void Init(ScriptableRenderContext context, Camera camera, ShadowSettings shadowSetting)
     {
         m_camera = camera;
         m_context = context;
+        m_shadowSetting = shadowSetting;
     }
 
     public void Render(bool useDynamicBatching, bool useGPUInstance)
     {
-        if( Cull() == false ) return ;
+        if( Cull(m_shadowSetting.maxDistance) == false ) return ;
 
         PrepareBuffer();
         m_context.SetupCameraProperties(m_camera);
@@ -68,10 +71,11 @@ public partial class GCameraRender
         m_buffer.Clear();
     }
 
-    private bool Cull()
+    private bool Cull(float maxShadowDistance)
     {
         if(m_camera.TryGetCullingParameters(out ScriptableCullingParameters cullingParameters) )
         {
+            cullingParameters.shadowDistance = Mathf.Min(maxShadowDistance, m_camera.farClipPlane);
             m_cullingResult = m_context.Cull(ref cullingParameters);
             return true;
         }
