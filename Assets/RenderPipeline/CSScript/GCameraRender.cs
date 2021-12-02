@@ -15,7 +15,7 @@ public partial class GCameraRender
     GLight m_light = new GLight();
     static ShaderTagId m_litShaderTagId = new ShaderTagId("LitSimple"); //自定义Lit
 
-    private ShadowSettings m_shadowSetting;
+    ShadowSettings m_shadowSetting;
 
     public void Init(ScriptableRenderContext context, Camera camera, ShadowSettings shadowSetting)
     {
@@ -29,23 +29,33 @@ public partial class GCameraRender
         if( Cull(m_shadowSetting.maxDistance) == false ) return ;
 
         PrepareBuffer();
+
+        m_buffer.BeginSample(m_sampleName);
+        m_context.ExecuteCommandBuffer(m_buffer);
+        m_buffer.Clear();
+        m_light.Init(m_context, m_cullingResult, m_shadowSetting);
+        m_buffer.EndSample(m_sampleName);
+        m_context.ExecuteCommandBuffer(m_buffer);
+        m_buffer.Clear();
+        
         m_context.SetupCameraProperties(m_camera);
         ClearRenderTarget();
         m_buffer.BeginSample(m_sampleName);
-        ExecuteBuffer();
+        m_context.ExecuteCommandBuffer(m_buffer);
+        m_buffer.Clear();
 
-        m_light.Init(m_context, m_cullingResult);
         DrawObject(useDynamicBatching, useGPUInstance);
         DrawUnsupportedShaders();
         DrawGizmos();
+        m_light.Clear();
 
         m_buffer.EndSample(m_sampleName);
-        ExecuteBuffer();
-
+        m_context.ExecuteCommandBuffer(m_buffer);
+        m_buffer.Clear();
         m_context.Submit();
     }
 
-    private void ClearRenderTarget()
+    void ClearRenderTarget()
     {
         bool clearDepth = true;
         CameraClearFlags flags = m_camera.clearFlags;
@@ -65,13 +75,7 @@ public partial class GCameraRender
         m_buffer.ClearRenderTarget(clearDepth, clearColor, color);
     }
 
-    private void ExecuteBuffer()
-    {
-        m_context.ExecuteCommandBuffer(m_buffer);
-        m_buffer.Clear();
-    }
-
-    private bool Cull(float maxShadowDistance)
+    bool Cull(float maxShadowDistance)
     {
         if(m_camera.TryGetCullingParameters(out ScriptableCullingParameters cullingParameters) )
         {
@@ -83,7 +87,7 @@ public partial class GCameraRender
         return false;
     }
 
-    private void DrawObject(bool useDynamicBatching, bool useGPUInstance)
+    void DrawObject(bool useDynamicBatching, bool useGPUInstance)
     {
         var sortingSetting = new SortingSettings(m_camera){criteria = SortingCriteria.CommonOpaque};
         var drawingSetting = new DrawingSettings(m_unlitShaderTagId, sortingSetting){

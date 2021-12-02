@@ -21,6 +21,7 @@
         Pass
         {
             Name "Brdf"
+            Tags {"LightMode"="SRPDefaultUnlit"}
             Blend [_SrcBlend] [_DstBlend]
             ZWrite [_ZWrite]
 
@@ -34,7 +35,6 @@
             #pragma shader_feature _PREMULTIPLY_ALPHA
 
             #include "../Library/Lighting.hlsl"
-
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
 
             UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
@@ -120,9 +120,77 @@
                 color += surfaceData.emission;
                 return float4(color, surfaceData.alpha);
             }
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Tags {"LightMode"="ShadowCaster"}
+            ColorMask 0
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma target 3.5
+            #pragma multi_compile_instancing
+
+            #include "../Library/Lighting.hlsl"
+            TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
+
+            UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _BaseColor)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _MainTex_ST)
+                UNITY_DEFINE_INSTANCED_PROP(float, _CutOff)
+            UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
+
+            struct a2v
+            {
+                float3 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct v2f
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            v2f vert(a2v i)
+            {
+                v2f o;
+                UNITY_SETUP_INSTANCE_ID(i);
+                UNITY_TRANSFER_INSTANCE_ID(i, o);
+                o.positionCS = TransformObjectToHClip(i.positionOS);
+
+            #if UNITY_REVERSED_Z
+                o.positionCS.z = min(o.positionCS.z, o.positionCS.w * UNITY_NEAR_CLIP_VALUE);
+            #else
+                o.positionCS.z = max(o.positionCS.z, o.positionCS.w * UNITY_NEAR_CLIP_VALUE);
+            #endif
+
+                float4 mainST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _MainTex_ST);
+                o.uv = i.uv * mainST.xy + mainST.zw;
+                return o;
+            }
+
+            void frag(v2f i)
+            {
+                UNITY_SETUP_INSTANCE_ID(i);
+                float4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+                float4 baseColor = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
+                float4 color = texColor * baseColor;
+
+            #if defined(_CLIPPING)
+                float cutoff = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _CutOff);
+		        clip(color.alpha - cutoff);
+            #endif
+            }
 
             ENDHLSL
         }
+
     }
 
     CustomEditor "CustomShaderGUI"

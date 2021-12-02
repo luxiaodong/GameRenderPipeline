@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: RenderPipelineAsset
   m_EditorClassIdentifier: 
   m_shadowSetting:
-    maxDistance: 100
-    directional:
-      atlasSize: 1024
+    maxDistance: 20
+    m_directional:
+      m_shadowMapSize: 1024
   m_enableDynamicBatching: 0
   m_enableGPUInstance: 0
   m_enableSRPBatcher: 0

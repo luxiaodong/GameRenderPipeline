@@ -3,7 +3,7 @@
 [System.Serializable]
 public class ShadowSettings {
 
-	public enum MapSize {
+	public enum ShadowMapSize {
 		_512 = 512, _1024 = 1024, _2048 = 2048
 	}
 
@@ -20,7 +20,7 @@ public class ShadowSettings {
 	[System.Serializable]
 	public struct Directional {
 
-		public MapSize atlasSize;
+		public ShadowMapSize m_shadowMapSize;
 
 		// public FilterMode filter;
 
@@ -43,8 +43,8 @@ public class ShadowSettings {
 		// public CascadeBlendMode cascadeBlend;
 	}
 
-	public Directional directional = new Directional {
-		atlasSize = MapSize._1024,
+	public Directional m_directional = new Directional {
+		m_shadowMapSize = ShadowMapSize._1024,
 		// filter = FilterMode.PCF2x2,
 		// cascadeCount = 4,
 		// cascadeRatio1 = 0.1f,
