@@ -37,7 +37,7 @@ public partial class GCameraRender
         m_buffer.EndSample(m_sampleName);
         m_context.ExecuteCommandBuffer(m_buffer);
         m_buffer.Clear();
-        
+
         m_context.SetupCameraProperties(m_camera);
         ClearRenderTarget();
         m_buffer.BeginSample(m_sampleName);
