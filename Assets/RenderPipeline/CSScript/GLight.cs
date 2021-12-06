@@ -64,7 +64,6 @@ public class GLight
         Light light = visibleLight.light;
         m_directionalLightColors[index] = light.color.linear * light.intensity;
         m_directionalLightDirections[index] = -light.transform.forward;
-        m_directionalLightDirections[index] =  new Vector3(0.3213938f, 0.7660444f, -0.5566705f);
     }
 
     void SendLightDataToShader(int directionalCount)

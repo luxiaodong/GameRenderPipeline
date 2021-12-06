@@ -80,13 +80,27 @@ public class GShadow
             m_buffer.Clear();
             m_context.DrawShadows(ref shadowDrawSetting);
 
-            m_directionalShadowMatrixs[i] = projMatrix*viewMatrix;
+            // m_directionalShadowMatrixs[i] = projMatrix*viewMatrix;
+            m_directionalShadowMatrixs[i] = GetShadowTransform(projMatrix, viewMatrix);
             m_directionalShadowData[i] = new Vector4(dirLightShadow.m_strength,0,0,0);
         }
 
         m_buffer.EndSample(m_bufferName);
         m_context.ExecuteCommandBuffer(m_buffer);
         m_buffer.Clear();
+    }
+
+    Matrix4x4 GetShadowTransform(Matrix4x4 proj, Matrix4x4 view)
+    {
+        if (SystemInfo.usesReversedZBuffer)
+        {
+            proj.m20 = -proj.m20;
+            proj.m21 = -proj.m21;
+            proj.m22 = -proj.m22;
+            proj.m23 = -proj.m23;
+        }
+
+        return proj * view;
     }
 
     public void SendShadowDataToShader()
