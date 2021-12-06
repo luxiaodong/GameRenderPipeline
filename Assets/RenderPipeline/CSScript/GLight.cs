@@ -14,10 +14,12 @@ public class GLight
     static int m_directionalLightCountPropertyId = Shader.PropertyToID("_DirectionalLightCount");
     static int m_directionalLightColorPropertyId = Shader.PropertyToID("_DirectionalLightColors");
     static int m_directionalLightDirectionPropertyId = Shader.PropertyToID("_DirectionalLightDirections");
+    static int m_lightShadowDatasPropertyId = Shader.PropertyToID("_LightShadowDatas");
 
     const int m_maxDirectionalLightCount = 4;
     static Vector4[] m_directionalLightColors = new Vector4[m_maxDirectionalLightCount];
     static Vector4[] m_directionalLightDirections = new Vector4[m_maxDirectionalLightCount];
+    static Vector4[] m_lightShadowDatas = new Vector4[m_maxDirectionalLightCount];
 
     GShadow m_shadow = new GShadow();
 
@@ -47,7 +49,7 @@ public class GLight
             if(visibleLight.lightType == LightType.Directional)
             {
                 SetDirectionalLightData(directionalIndex, ref visibleLight);
-                m_shadow.SetDirectionalShadowData(directionalIndex, visibleLight.light.shadows, visibleLight.light.shadowStrength);
+                m_shadow.SetDirectionalShadowData(directionalIndex, visibleLight.light.shadows);
                 directionalIndex++;
                 if(directionalIndex == m_maxDirectionalLightCount)
                 {
@@ -64,6 +66,8 @@ public class GLight
         Light light = visibleLight.light;
         m_directionalLightColors[index] = light.color.linear * light.intensity;
         m_directionalLightDirections[index] = -light.transform.forward;
+        Vector4 shadowData = new Vector4( visibleLight.light.shadowStrength, visibleLight.light.shadowBias, visibleLight.light.shadowNormalBias, 0);
+        m_lightShadowDatas[index] = shadowData;
     }
 
     void SendLightDataToShader(int directionalCount)
@@ -71,6 +75,7 @@ public class GLight
         m_buffer.SetGlobalInt(m_directionalLightCountPropertyId, directionalCount);
         m_buffer.SetGlobalVectorArray(m_directionalLightColorPropertyId, m_directionalLightColors);
         m_buffer.SetGlobalVectorArray(m_directionalLightDirectionPropertyId, m_directionalLightDirections);
+        m_buffer.SetGlobalVectorArray(m_lightShadowDatasPropertyId, m_lightShadowDatas);
         m_shadow.SendShadowDataToShader();
     }
 

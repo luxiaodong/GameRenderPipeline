@@ -8,7 +8,7 @@ public class GShadow
 {
     struct DirectionalLightShadow {
         public int m_visibleLightIndex;
-        public float m_strength;
+        // public float m_strength;
     }
 
     const string m_bufferName = "Shadow";
@@ -20,7 +20,6 @@ public class GShadow
 
     static int m_directionalShadowMapPropertyId = Shader.PropertyToID("_DirectionalShadowMap");
     static int m_directionalShadowMatrixsPropertyId = Shader.PropertyToID("_DirectionalShadowMatrixs");
-    static int m_directionalShadowDataPropertyId = Shader.PropertyToID("_DirectionalShadowData");
 
     const int m_maxDirectionalLightShadowCount = 1;
     int m_directionalLightShadowCount = 0;
@@ -35,14 +34,13 @@ public class GShadow
         m_shadowSetting = shadowSetting;
     }
 
-    public void SetDirectionalShadowData(int index, LightShadows shadows, float shadowStrength)
+    public void SetDirectionalShadowData(int index, LightShadows shadows)
     {
         if( m_directionalLightShadowCount < m_maxDirectionalLightShadowCount && 
             shadows != LightShadows.None && 
             m_cullingResult.GetShadowCasterBounds(index, out Bounds b))
         {
-            m_directionalLightShadow[m_directionalLightShadowCount] = new DirectionalLightShadow{
-                m_visibleLightIndex = index, m_strength = shadowStrength};
+            m_directionalLightShadow[m_directionalLightShadowCount] = new DirectionalLightShadow{m_visibleLightIndex = index};
             m_directionalLightShadowCount++;
         }
     }
@@ -82,7 +80,7 @@ public class GShadow
 
             // m_directionalShadowMatrixs[i] = projMatrix*viewMatrix;
             m_directionalShadowMatrixs[i] = GetShadowTransform(projMatrix, viewMatrix);
-            m_directionalShadowData[i] = new Vector4(dirLightShadow.m_strength,0,0,0);
+            // m_directionalShadowData[i] = new Vector4(dirLightShadow.m_strength,0,0,0);
         }
 
         m_buffer.EndSample(m_bufferName);
@@ -106,7 +104,7 @@ public class GShadow
     public void SendShadowDataToShader()
     {
         m_buffer.SetGlobalMatrixArray(m_directionalShadowMatrixsPropertyId, m_directionalShadowMatrixs);
-        m_buffer.SetGlobalVectorArray(m_directionalShadowDataPropertyId, m_directionalShadowData);
+        // m_buffer.SetGlobalVectorArray(m_directionalShadowDataPropertyId, m_directionalShadowData);
     }
 
     public void Clear()

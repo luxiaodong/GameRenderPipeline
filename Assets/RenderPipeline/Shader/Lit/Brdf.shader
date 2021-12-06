@@ -75,7 +75,10 @@
                 float4 mainST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _MainTex_ST);
                 o.uv = i.uv * mainST.xy + mainST.zw;
                 o.viewDirectionWS = normalize(_WorldSpaceCameraPos - o.positionWS);
-                o.shadowCoord = TransformWorldToShadowCoord(0, o.positionWS);
+
+                Light light = GetDirectionalLight(0);
+                float3 positionWS = o.positionWS + o.normalWS * light.shadowBias;
+                o.shadowCoord = TransformWorldToShadowCoord(0, positionWS);
                 return o;
             }
 
@@ -106,9 +109,6 @@
                 inputData.viewDirectionWS = i.viewDirectionWS;
                 inputData.bakedGI = float3(0,0,0);
                 inputData.shadowCoord = i.shadowCoord;
-
-                // float t = SampleDirectionalShadowMap(inputData.shadowCoord);
-                // return float4(t,t,t,1);
 
                 bool preMultiAlpha = false;
             #if defined(_PREMULTIPLY_ALPHA)

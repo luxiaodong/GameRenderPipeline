@@ -10,7 +10,6 @@ SAMPLER_CMP(SHADOW_SAMPLER);
 
 CBUFFER_START(_CustomShadow)
     float4x4 _DirectionalShadowMatrixs[MAX_DIRECTIONAL_LIGHT_SHADOW_COUNT];
-    float4 _DirectionalShadowData[MAX_DIRECTIONAL_LIGHT_SHADOW_COUNT];
 CBUFFER_END
 
 float3 TransformWorldToShadowCoord(int index, float3 positionWS)
