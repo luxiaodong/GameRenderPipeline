@@ -8,7 +8,6 @@ public class GShadow
 {
     struct DirectionalLightShadow {
         public int m_visibleLightIndex;
-        // public float m_strength;
     }
 
     const string m_bufferName = "Shadow";
@@ -77,10 +76,8 @@ public class GShadow
             m_context.ExecuteCommandBuffer(m_buffer);
             m_buffer.Clear();
             m_context.DrawShadows(ref shadowDrawSetting);
-
-            // m_directionalShadowMatrixs[i] = projMatrix*viewMatrix;
+            
             m_directionalShadowMatrixs[i] = GetShadowTransform(projMatrix, viewMatrix);
-            // m_directionalShadowData[i] = new Vector4(dirLightShadow.m_strength,0,0,0);
         }
 
         m_buffer.EndSample(m_bufferName);

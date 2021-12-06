@@ -15,7 +15,7 @@ float3 lambert(Light light, SurfaceData surfaceData, InputData inputData)
     return light.color * surfaceData.albedo * ndotl;
 }
 
-float3 brdf_direct(Light light, SurfaceData surfaceData, InputData inputData, bool preMultiAlpha)
+float3 brdf_direct(int i, Light light, SurfaceData surfaceData, InputData inputData, bool preMultiAlpha)
 {
     float oneMinusReflectivity = OneMinusReflectivityMetallic(surfaceData.metallic);
     float reflectivity = 1.0 - oneMinusReflectivity;
@@ -30,7 +30,11 @@ float3 brdf_direct(Light light, SurfaceData surfaceData, InputData inputData, bo
     float3 specularTerm = GetBrdf(inputData.normalWS, light.direction, inputData.viewDirectionWS, brdfData.roughness, brdfData.specular);
     float ndotl = saturate(dot(inputData.normalWS, light.direction));
     float3 color = brdfData.diffuse + specularTerm * brdfData.specular;
+
+    float3 positionWS = inputData.positionWS + inputData.normalWS * light.shadowBias;
+    inputData.shadowCoord = TransformWorldToShadowCoord(i, positionWS);
     float shadow = SampleDirectionalShadowMap(inputData.shadowCoord);
+
     float attenuation = lerp(1, shadow, light.shadowStrength);
     color *= light.color * attenuation * ndotl;
     return color;

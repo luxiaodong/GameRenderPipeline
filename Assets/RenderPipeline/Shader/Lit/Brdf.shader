@@ -60,7 +60,7 @@
                 float3 normalWS : TEXCOORD1;
                 float3 positionWS  : TEXCOORD2;
                 float3 viewDirectionWS  : TEXCOORD3;
-                float3 shadowCoord : TEXCOORD4;
+                //float3 shadowCoord : TEXCOORD4;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -75,10 +75,6 @@
                 float4 mainST = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _MainTex_ST);
                 o.uv = i.uv * mainST.xy + mainST.zw;
                 o.viewDirectionWS = normalize(_WorldSpaceCameraPos - o.positionWS);
-
-                Light light = GetDirectionalLight(0);
-                float3 positionWS = o.positionWS + o.normalWS * light.shadowBias;
-                o.shadowCoord = TransformWorldToShadowCoord(0, positionWS);
                 return o;
             }
 
@@ -108,7 +104,7 @@
                 inputData.normalWS = i.normalWS;
                 inputData.viewDirectionWS = i.viewDirectionWS;
                 inputData.bakedGI = float3(0,0,0);
-                inputData.shadowCoord = i.shadowCoord;
+                // inputData.shadowCoord = i.shadowCoord;
 
                 bool preMultiAlpha = false;
             #if defined(_PREMULTIPLY_ALPHA)
@@ -119,7 +115,7 @@
                 for(int i=0; i < GetDirectionalLightCount(); ++i)
                 {
                     Light light = GetDirectionalLight(i);
-                    color += brdf_direct(light, surfaceData, inputData, preMultiAlpha);
+                    color += brdf_direct(i, light, surfaceData, inputData, preMultiAlpha);
                     // color += brdf_indirect(light, surfaceData, inputData);
                 }
 
