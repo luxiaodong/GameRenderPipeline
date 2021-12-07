@@ -138,7 +138,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &296911853
 Light:
   m_ObjectHideFlags: 0
@@ -207,13 +207,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 296911852}
-  m_LocalRotation: {x: 0.51682746, y: -0.058177795, z: 0.03523373, w: 0.8533835}
+  m_LocalRotation: {x: 0.77347976, y: 0.1634905, z: -0.38121086, w: 0.47924763}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 62.4, y: -7.8, z: 0}
+  m_LocalEulerAnglesHint: {x: 120, y: 60, z: 13}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,7 +243,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.802082
@@ -322,7 +322,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &799055794
 Light:
   m_ObjectHideFlags: 0
@@ -335,7 +335,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 0, g: 0, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.8
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.802082
@@ -391,13 +391,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 799055793}
-  m_LocalRotation: {x: 0.54708904, y: 0.407656, z: -0.4015574, w: 0.6109516}
+  m_LocalRotation: {x: 0.07184475, y: 0.37048647, z: -0.29347062, w: 0.87832403}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 84.8, y: 40.4, z: -29.49}
+  m_LocalEulerAnglesHint: {x: 20.1, y: 40.4, z: -29.49}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -646,7 +646,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &1594377667
 Light:
   m_ObjectHideFlags: 0
@@ -659,7 +659,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 0, g: 1, b: 0.15949917, a: 1}
-  m_Intensity: 1
+  m_Intensity: 1.1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.802082

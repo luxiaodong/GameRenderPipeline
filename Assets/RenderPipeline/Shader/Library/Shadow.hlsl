@@ -14,14 +14,22 @@ CBUFFER_END
 
 float3 TransformWorldToShadowCoord(int index, float3 positionWS)
 {
-    float4x4 clip = float4x4(
-        0.5f, 0.0f, 0.0f, 0.5f,
-        0.0f, 0.5f, 0.0f, 0.5f,
-        0.0f, 0.0f, 0.5f, 0.5f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    );
+    // float4x4 tile = float4x4(
+    //     0.5f, 0.0f, 0.0f, 0.0f,
+    //     0.0f, 0.5f, 0.0f, 0.0f,
+    //     0.0f, 0.0f, 1.0f, 0.0f,
+    //     0.0f, 0.0f, 0.0f, 1.0f
+    // );
 
-    float4x4 mat = mul(clip, _DirectionalShadowMatrixs[index]);
+    // float4x4 clip = float4x4(
+    //     0.5f, 0.0f, 0.0f, 0.5f,
+    //     0.0f, 0.5f, 0.0f, 0.5f,
+    //     0.0f, 0.0f, 0.5f, 0.5f,
+    //     0.0f, 0.0f, 0.0f, 1.0f
+    // );
+
+    // float4x4 mat = mul( mul(tile,clip) , _DirectionalShadowMatrixs[index]);
+    float4x4 mat = _DirectionalShadowMatrixs[index];
     return mul(mat, float4(positionWS, 1)).xyz;
 }
 

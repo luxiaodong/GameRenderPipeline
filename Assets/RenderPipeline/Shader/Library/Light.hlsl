@@ -46,23 +46,4 @@ Light GetMainLight()
     return GetDirectionalLight(0);
 }
 
-// Light GetTestLight()
-// {
-//     Light light;
-//     light.position = float3(0,1,0);
-//     light.direction = _DirectionalLightDirection;
-//     light.color = _DirectionalLightColor;
-//     return light;
-// }
-
-// float3 GetMainLightDirection(Light light)
-// {
-//     return light.position;
-// }
-
-// float3 GetLightDirection(Light light, float3 posWS)
-// {
-//     return normalize(posWS - light.position);
-// }
-
 #endif

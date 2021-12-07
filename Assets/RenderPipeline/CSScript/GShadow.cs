@@ -20,7 +20,7 @@ public class GShadow
     static int m_directionalShadowMapPropertyId = Shader.PropertyToID("_DirectionalShadowMap");
     static int m_directionalShadowMatrixsPropertyId = Shader.PropertyToID("_DirectionalShadowMatrixs");
 
-    const int m_maxDirectionalLightShadowCount = 1;
+    const int m_maxDirectionalLightShadowCount = 4;
     int m_directionalLightShadowCount = 0;
     DirectionalLightShadow[] m_directionalLightShadow = new DirectionalLightShadow[m_maxDirectionalLightShadowCount];
     static Matrix4x4[] m_directionalShadowMatrixs = new Matrix4x4[m_maxDirectionalLightShadowCount];
@@ -63,6 +63,10 @@ public class GShadow
         m_context.ExecuteCommandBuffer(m_buffer);
         m_buffer.Clear();
 
+        // 1盏灯一个,最多4盏灯,分割成2x2个
+        int splitCount = m_directionalLightShadowCount == 1 ? 1 : 2;
+        int tileSize = shadowMapSize/splitCount;
+
         for(int i =0; i < m_directionalLightShadowCount; ++i)
         {
             DirectionalLightShadow dirLightShadow = m_directionalLightShadow[i];
@@ -72,12 +76,17 @@ public class GShadow
                 out Matrix4x4 viewMatrix, out Matrix4x4 projMatrix, out ShadowSplitData splitData);
 
             shadowDrawSetting.splitData = splitData;
+
+            Vector2 offset = new Vector2(i%splitCount, i/splitCount);
+            Rect r = new Rect( offset.x * tileSize, offset.y * tileSize, tileSize, tileSize);
+            m_buffer.SetViewport(r);
             m_buffer.SetViewProjectionMatrices(viewMatrix, projMatrix);
+
             m_context.ExecuteCommandBuffer(m_buffer);
             m_buffer.Clear();
             m_context.DrawShadows(ref shadowDrawSetting);
-            
-            m_directionalShadowMatrixs[i] = GetShadowTransform(projMatrix, viewMatrix);
+
+            m_directionalShadowMatrixs[i] = GetShadowTransform(offset, splitCount, projMatrix, viewMatrix);
         }
 
         m_buffer.EndSample(m_bufferName);
@@ -85,7 +94,7 @@ public class GShadow
         m_buffer.Clear();
     }
 
-    Matrix4x4 GetShadowTransform(Matrix4x4 proj, Matrix4x4 view)
+    Matrix4x4 GetShadowTransform(Vector2 offset, int splitCount, Matrix4x4 proj, Matrix4x4 view)
     {
         if (SystemInfo.usesReversedZBuffer)
         {
@@ -95,7 +104,20 @@ public class GShadow
             proj.m23 = -proj.m23;
         }
 
-        return proj * view;
+        float s = 1.0f/splitCount;
+        Matrix4x4 tile = Matrix4x4.identity;
+        tile.SetColumn(0, new Vector4(1.0f*s, 0, 0, 0));
+        tile.SetColumn(1, new Vector4(0, 1.0f*s, 0, 0));
+        tile.SetColumn(2, new Vector4(0, 0, 1, 0));
+        tile.SetColumn(3, new Vector4(offset.x*s, offset.y*s, 0, 1));
+
+        Matrix4x4 clip = Matrix4x4.identity;
+        clip.SetColumn(0, new Vector4(0.5f, 0, 0, 0));
+        clip.SetColumn(1, new Vector4(0, 0.5f, 0, 0));
+        clip.SetColumn(2, new Vector4(0, 0, 0.5f, 0));
+        clip.SetColumn(3, new Vector4(0.5f, 0.5f, 0.5f, 1));
+
+        return tile * clip * proj * view;
     }
 
     public void SendShadowDataToShader()
