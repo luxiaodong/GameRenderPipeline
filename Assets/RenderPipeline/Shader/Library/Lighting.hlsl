@@ -36,6 +36,7 @@ float3 brdf_direct(int i, Light light, SurfaceData surfaceData, InputData inputD
     float shadow = SampleDirectionalShadowMap(inputData.shadowCoord);
 
     float attenuation = lerp(1.0f, shadow, light.shadowStrength);
+    // attenuation = FindCascadeIndex(positionWS)*0.25f;
     color *= light.color * attenuation * ndotl;
     return color;
 }

@@ -2,6 +2,7 @@
 #define GAME_RENDER_PIPELINE_SHADOW
 
 #define MAX_DIRECTIONAL_LIGHT_SHADOW_COUNT 4
+#define MAX_CASCADE_COUNT 4
 
 TEXTURE2D_SHADOW(_DirectionalShadowMap);
 // SAMPLER_CMP(sampler_DirectionalShadowMap);
@@ -9,27 +10,35 @@ TEXTURE2D_SHADOW(_DirectionalShadowMap);
 SAMPLER_CMP(SHADOW_SAMPLER);
 
 CBUFFER_START(_CustomShadow)
-    float4x4 _DirectionalShadowMatrixs[MAX_DIRECTIONAL_LIGHT_SHADOW_COUNT];
+    float4x4 _DirectionalShadowMatrixs[MAX_DIRECTIONAL_LIGHT_SHADOW_COUNT*MAX_CASCADE_COUNT];
+    float4 _CascadeCullingSpheres[MAX_CASCADE_COUNT];
+    int _ShadowCascadesCount;
 CBUFFER_END
 
-float3 TransformWorldToShadowCoord(int index, float3 positionWS)
+float Distance(float3 a, float3 b)
 {
-    // float4x4 tile = float4x4(
-    //     0.5f, 0.0f, 0.0f, 0.0f,
-    //     0.0f, 0.5f, 0.0f, 0.0f,
-    //     0.0f, 0.0f, 1.0f, 0.0f,
-    //     0.0f, 0.0f, 0.0f, 1.0f
-    // );
+    return dot(a - b, a - b);
+}
 
-    // float4x4 clip = float4x4(
-    //     0.5f, 0.0f, 0.0f, 0.5f,
-    //     0.0f, 0.5f, 0.0f, 0.5f,
-    //     0.0f, 0.0f, 0.5f, 0.5f,
-    //     0.0f, 0.0f, 0.0f, 1.0f
-    // );
+int FindCascadeIndex(float3 positionWS)
+{
+    int index = _ShadowCascadesCount - 1;
+    for(int i = 0; i < _ShadowCascadesCount; ++i)
+    {
+        float4 cullingSpheres = _CascadeCullingSpheres[i];
+        if( Distance(cullingSpheres.xyz, positionWS) < cullingSpheres.w*cullingSpheres.w )
+        {
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
 
-    // float4x4 mat = mul( mul(tile,clip) , _DirectionalShadowMatrixs[index]);
-    float4x4 mat = _DirectionalShadowMatrixs[index];
+float3 TransformWorldToShadowCoord(int i, float3 positionWS)
+{
+    int j = FindCascadeIndex(positionWS);
+    float4x4 mat = _DirectionalShadowMatrixs[i*MAX_CASCADE_COUNT + j];
     return mul(mat, float4(positionWS, 1)).xyz;
 }
 

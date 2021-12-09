@@ -127,6 +127,7 @@
 
         Pass
         {
+            Name "ShadowCaster"
             Tags {"LightMode"="ShadowCaster"}
             ColorMask 0
 

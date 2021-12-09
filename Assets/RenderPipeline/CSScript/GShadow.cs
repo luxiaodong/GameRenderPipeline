@@ -19,18 +19,23 @@ public class GShadow
 
     static int m_directionalShadowMapPropertyId = Shader.PropertyToID("_DirectionalShadowMap");
     static int m_directionalShadowMatrixsPropertyId = Shader.PropertyToID("_DirectionalShadowMatrixs");
+    static int m_shadowCascadesCountPropertyId = Shader.PropertyToID("_ShadowCascadesCount");
+    static int m_cascadeCullingSpheresPropertyId = Shader.PropertyToID("_CascadeCullingSpheres");
 
     const int m_maxDirectionalLightShadowCount = 4;
     int m_directionalLightShadowCount = 0;
+    const int m_maxShadowCascadeCount = 4;
+    int m_shadowCascadeCount = 0;
     DirectionalLightShadow[] m_directionalLightShadow = new DirectionalLightShadow[m_maxDirectionalLightShadowCount];
-    static Matrix4x4[] m_directionalShadowMatrixs = new Matrix4x4[m_maxDirectionalLightShadowCount];
-    static Vector4[] m_directionalShadowData = new Vector4[m_maxDirectionalLightShadowCount];
+    static Matrix4x4[] m_directionalShadowMatrixs = new Matrix4x4[m_maxDirectionalLightShadowCount*m_maxShadowCascadeCount];
+    static Vector4[] m_cascadeCullingSpheres = new Vector4[m_maxShadowCascadeCount];
 
     public void Init(ScriptableRenderContext context, CullingResults cullingResult, ShadowSettings shadowSetting)
     {
         m_context = context;
         m_cullingResult = cullingResult;
         m_shadowSetting = shadowSetting;
+        m_shadowCascadeCount = m_shadowSetting.m_directional.m_cascadeCount;
     }
 
     public void SetDirectionalShadowData(int index, LightShadows shadows)
@@ -66,27 +71,45 @@ public class GShadow
         // 1盏灯一个,最多4盏灯,分割成2x2个
         int splitCount = m_directionalLightShadowCount == 1 ? 1 : 2;
         int tileSize = shadowMapSize/splitCount;
+        Vector3 cascadeRatio = new Vector3(
+            m_shadowSetting.m_directional.m_cascadeRatio1, 
+            m_shadowSetting.m_directional.m_cascadeRatio2,
+            m_shadowSetting.m_directional.m_cascadeRatio3);
 
-        for(int i =0; i < m_directionalLightShadowCount; ++i)
+        for(int i=0; i < m_directionalLightShadowCount; ++i)
         {
             DirectionalLightShadow dirLightShadow = m_directionalLightShadow[i];
             var shadowDrawSetting = new ShadowDrawingSettings(m_cullingResult, dirLightShadow.m_visibleLightIndex);
-            m_cullingResult.ComputeDirectionalShadowMatricesAndCullingPrimitives(
-                dirLightShadow.m_visibleLightIndex, 0, 1, Vector3.zero, shadowMapSize, 0,
-                out Matrix4x4 viewMatrix, out Matrix4x4 projMatrix, out ShadowSplitData splitData);
+            Vector2 tileOffset = new Vector2(i%splitCount, i/splitCount);
 
-            shadowDrawSetting.splitData = splitData;
+            int cascadeSplitCount = m_shadowCascadeCount == 1 ? 1 : 2;
+            int cascadeTileSize = tileSize/cascadeSplitCount;
 
-            Vector2 offset = new Vector2(i%splitCount, i/splitCount);
-            Rect r = new Rect( offset.x * tileSize, offset.y * tileSize, tileSize, tileSize);
-            m_buffer.SetViewport(r);
-            m_buffer.SetViewProjectionMatrices(viewMatrix, projMatrix);
+            for(int j=0; j < m_shadowCascadeCount; ++j)
+            {
+                m_cullingResult.ComputeDirectionalShadowMatricesAndCullingPrimitives(
+                    dirLightShadow.m_visibleLightIndex, j, m_shadowCascadeCount, cascadeRatio, cascadeTileSize, 0,
+                    out Matrix4x4 viewMatrix, out Matrix4x4 projMatrix, out ShadowSplitData splitData);
+                shadowDrawSetting.splitData = splitData;
 
-            m_context.ExecuteCommandBuffer(m_buffer);
-            m_buffer.Clear();
-            m_context.DrawShadows(ref shadowDrawSetting);
+                if(i == 0)
+                {
+                    m_cascadeCullingSpheres[j] = splitData.cullingSphere;
+                }
 
-            m_directionalShadowMatrixs[i] = GetShadowTransform(offset, splitCount, projMatrix, viewMatrix);
+                Vector2 cascadeOffset = new Vector2(j%cascadeSplitCount, j/cascadeSplitCount);
+                Rect r = new Rect(  tileOffset.x*tileSize + cascadeOffset.x*cascadeTileSize,
+                                    tileOffset.y*tileSize + cascadeOffset.y*cascadeTileSize,
+                                    cascadeTileSize, cascadeTileSize);
+                m_buffer.SetViewport(r);
+                m_buffer.SetViewProjectionMatrices(viewMatrix, projMatrix);
+
+                m_context.ExecuteCommandBuffer(m_buffer);
+                m_buffer.Clear();
+                m_context.DrawShadows(ref shadowDrawSetting);
+
+                m_directionalShadowMatrixs[i*m_maxShadowCascadeCount+j] = GetShadowTransform(tileOffset, splitCount, cascadeOffset, cascadeSplitCount, projMatrix, viewMatrix);
+            }
         }
 
         m_buffer.EndSample(m_bufferName);
@@ -94,7 +117,7 @@ public class GShadow
         m_buffer.Clear();
     }
 
-    Matrix4x4 GetShadowTransform(Vector2 offset, int splitCount, Matrix4x4 proj, Matrix4x4 view)
+    Matrix4x4 GetShadowTransform(Vector2 tileOffset, int splitCount, Vector2 cascadeOffset, int cascadeSplitCount, Matrix4x4 proj, Matrix4x4 view)
     {
         if (SystemInfo.usesReversedZBuffer)
         {
@@ -104,12 +127,23 @@ public class GShadow
             proj.m23 = -proj.m23;
         }
 
-        float s = 1.0f/splitCount;
+        float s = 1.0f/cascadeSplitCount;
+        Matrix4x4 cascade = Matrix4x4.identity;
+        cascade.SetColumn(0, new Vector4(s, 0, 0, 0));
+        cascade.SetColumn(1, new Vector4(0, s, 0, 0));
+        cascade.SetColumn(2, new Vector4(0, 0, 1, 0));
+        cascade.SetColumn(3, new Vector4(cascadeOffset.x*s, cascadeOffset.y*s, 0, 1));
+
+        // Debug.Log("cascade is \n" + cascade);
+
+        s = 1.0f/splitCount;
         Matrix4x4 tile = Matrix4x4.identity;
-        tile.SetColumn(0, new Vector4(1.0f*s, 0, 0, 0));
-        tile.SetColumn(1, new Vector4(0, 1.0f*s, 0, 0));
+        tile.SetColumn(0, new Vector4(s, 0, 0, 0));
+        tile.SetColumn(1, new Vector4(0, s, 0, 0));
         tile.SetColumn(2, new Vector4(0, 0, 1, 0));
-        tile.SetColumn(3, new Vector4(offset.x*s, offset.y*s, 0, 1));
+        tile.SetColumn(3, new Vector4(tileOffset.x*s, tileOffset.y*s, 0, 1));
+
+        // Debug.Log("tile is \n" + tile);
 
         Matrix4x4 clip = Matrix4x4.identity;
         clip.SetColumn(0, new Vector4(0.5f, 0, 0, 0));
@@ -117,13 +151,14 @@ public class GShadow
         clip.SetColumn(2, new Vector4(0, 0, 0.5f, 0));
         clip.SetColumn(3, new Vector4(0.5f, 0.5f, 0.5f, 1));
 
-        return tile * clip * proj * view;
+        return cascade * tile * clip * proj * view;
     }
 
     public void SendShadowDataToShader()
     {
         m_buffer.SetGlobalMatrixArray(m_directionalShadowMatrixsPropertyId, m_directionalShadowMatrixs);
-        // m_buffer.SetGlobalVectorArray(m_directionalShadowDataPropertyId, m_directionalShadowData);
+        m_buffer.SetGlobalInt(m_shadowCascadesCountPropertyId, m_shadowCascadeCount);
+        m_buffer.SetGlobalVectorArray(m_cascadeCullingSpheresPropertyId, m_cascadeCullingSpheres);
     }
 
     public void Clear()
