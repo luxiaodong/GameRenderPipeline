@@ -8,6 +8,7 @@ public class GShadow
 {
     struct DirectionalLightShadow {
         public int m_visibleLightIndex;
+        public float m_nearPlane;
     }
 
     const string m_bufferName = "Shadow";
@@ -40,13 +41,15 @@ public class GShadow
         m_shadowCascadeCount = m_shadowSetting.m_directional.m_cascadeCount;
     }
 
-    public void SetDirectionalShadowData(int index, LightShadows shadows)
+    public void SetDirectionalShadowData(int index, LightShadows shadows, float nearPlane)
     {
         if( m_directionalLightShadowCount < m_maxDirectionalLightShadowCount && 
             shadows != LightShadows.None && 
             m_cullingResult.GetShadowCasterBounds(index, out Bounds b))
         {
-            m_directionalLightShadow[m_directionalLightShadowCount] = new DirectionalLightShadow{m_visibleLightIndex = index};
+            m_directionalLightShadow[m_directionalLightShadowCount] = new DirectionalLightShadow{
+                m_visibleLightIndex = index, m_nearPlane = nearPlane};
+                
             m_directionalLightShadowCount++;
         }
     }
@@ -90,7 +93,7 @@ public class GShadow
             for(int j=0; j < m_shadowCascadeCount; ++j)
             {
                 m_cullingResult.ComputeDirectionalShadowMatricesAndCullingPrimitives(
-                    dirLightShadow.m_visibleLightIndex, j, m_shadowCascadeCount, cascadeRatio, cascadeTileSize, 0,
+                    dirLightShadow.m_visibleLightIndex, j, m_shadowCascadeCount, cascadeRatio, cascadeTileSize, dirLightShadow.m_nearPlane,
                     out Matrix4x4 viewMatrix, out Matrix4x4 projMatrix, out ShadowSplitData splitData);
                 shadowDrawSetting.splitData = splitData;
 

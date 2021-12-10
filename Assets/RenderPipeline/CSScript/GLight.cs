@@ -49,7 +49,7 @@ public class GLight
             if(visibleLight.lightType == LightType.Directional)
             {
                 SetDirectionalLightData(directionalIndex, ref visibleLight);
-                m_shadow.SetDirectionalShadowData(directionalIndex, visibleLight.light.shadows);
+                m_shadow.SetDirectionalShadowData(directionalIndex, visibleLight.light.shadows, visibleLight.light.shadowNearPlane);
                 directionalIndex++;
                 if(directionalIndex == m_maxDirectionalLightCount)
                 {
