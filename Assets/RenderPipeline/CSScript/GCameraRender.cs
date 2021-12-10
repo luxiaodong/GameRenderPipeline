@@ -26,7 +26,7 @@ public partial class GCameraRender
 
     public void Render(bool useDynamicBatching, bool useGPUInstance)
     {
-        if( Cull(m_shadowSetting.maxDistance) == false ) return ;
+        if( Cull(m_shadowSetting.m_maxDistance) == false ) return ;
 
         PrepareBuffer();
 

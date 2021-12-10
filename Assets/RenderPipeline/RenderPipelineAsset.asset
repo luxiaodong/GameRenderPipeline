@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: RenderPipelineAsset
   m_EditorClassIdentifier: 
   m_shadowSetting:
-    maxDistance: 30
+    m_maxDistance: 14
+    m_fadePercent: 0.8
     m_directional:
       m_shadowMapSize: 1024
-      m_cascadeCount: 2
-      m_cascadeRatio1: 0.524
-      m_cascadeRatio2: 0.655
-      m_cascadeRatio3: 0.869
+      m_cascadeCount: 4
+      m_cascadeRatio1: 0.279
+      m_cascadeRatio2: 0.398
+      m_cascadeRatio3: 0.851
   m_enableDynamicBatching: 0
   m_enableGPUInstance: 0
   m_enableSRPBatcher: 0

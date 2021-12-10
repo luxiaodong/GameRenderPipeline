@@ -21,6 +21,8 @@ public class GShadow
     static int m_directionalShadowMatrixsPropertyId = Shader.PropertyToID("_DirectionalShadowMatrixs");
     static int m_shadowCascadesCountPropertyId = Shader.PropertyToID("_ShadowCascadesCount");
     static int m_cascadeCullingSpheresPropertyId = Shader.PropertyToID("_CascadeCullingSpheres");
+    // static int m_shadowDistancePropertyId = Shader.PropertyToID("_ShadowDistance");
+    static int m_shadowDistanceFadePropertyId = Shader.PropertyToID("_ShadowDistanceFade");
 
     const int m_maxDirectionalLightShadowCount = 4;
     int m_directionalLightShadowCount = 0;
@@ -150,6 +152,8 @@ public class GShadow
 
     public void SendShadowDataToShader()
     {
+        Vector3 fadeDistance = new Vector3(m_shadowSetting.m_maxDistance*m_shadowSetting.m_fadePercent,m_shadowSetting.m_maxDistance, m_shadowSetting.m_fadePercent);
+        m_buffer.SetGlobalVector(m_shadowDistanceFadePropertyId, fadeDistance );
         m_buffer.SetGlobalMatrixArray(m_directionalShadowMatrixsPropertyId, m_directionalShadowMatrixs);
         m_buffer.SetGlobalInt(m_shadowCascadesCountPropertyId, m_shadowCascadeCount);
         m_buffer.SetGlobalVectorArray(m_cascadeCullingSpheresPropertyId, m_cascadeCullingSpheres);

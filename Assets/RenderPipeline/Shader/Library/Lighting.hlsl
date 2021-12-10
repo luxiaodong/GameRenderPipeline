@@ -31,12 +31,18 @@ float3 brdf_direct(int i, Light light, SurfaceData surfaceData, InputData inputD
     float ndotl = saturate(dot(inputData.normalWS, light.direction));
     float3 color = brdfData.diffuse + specularTerm * brdfData.specular;
 
-    float3 positionWS = inputData.positionWS + inputData.normalWS * light.shadowBias;
-    inputData.shadowCoord = TransformWorldToShadowCoord(i, positionWS);
-    float shadow = SampleDirectionalShadowMap(inputData.shadowCoord);
+    float3 positionWS = inputData.positionWS;// + inputData.normalWS * light.shadowBias;
 
-    float attenuation = lerp(1.0f, shadow, light.shadowStrength);
-    // attenuation = FindCascadeIndex(positionWS)*0.25f;
+    ShadowData shadowData = GetShadowData(positionWS);
+    float attenuation = 1.0f;
+    if (shadowData.strength > HALF_MIN)
+    {
+        inputData.shadowCoord = TransformWorldToShadowCoord(i, shadowData.cascadeIndex, positionWS);
+        float shadow = SampleDirectionalShadowMap(inputData.shadowCoord);
+        attenuation = lerp(1.0f, shadow, light.shadowStrength * shadowData.strength );
+    }
+
+    // attenuation = shadowData.cascadeIndex*0.25f;
     color *= light.color * attenuation * ndotl;
     return color;
 }

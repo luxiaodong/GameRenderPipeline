@@ -13,32 +13,51 @@ CBUFFER_START(_CustomShadow)
     float4x4 _DirectionalShadowMatrixs[MAX_DIRECTIONAL_LIGHT_SHADOW_COUNT*MAX_CASCADE_COUNT];
     float4 _CascadeCullingSpheres[MAX_CASCADE_COUNT];
     int _ShadowCascadesCount;
+    float3 _ShadowDistanceFade;
 CBUFFER_END
+
+struct ShadowData
+{
+    int cascadeIndex;
+    float strength;
+};
 
 float Distance(float3 a, float3 b)
 {
     return dot(a - b, a - b);
 }
 
-int FindCascadeIndex(float3 positionWS)
+ShadowData GetShadowData(float3 positionWS)
 {
-    int index = _ShadowCascadesCount - 1;
-    for(int i = 0; i < _ShadowCascadesCount; ++i)
+    float viewZ = -TransformWorldToView(positionWS).z;
+    ShadowData data;
+    data.cascadeIndex = _ShadowCascadesCount;
+    float p = (viewZ - _ShadowDistanceFade.x)/(_ShadowDistanceFade.y - _ShadowDistanceFade.x);
+    data.strength = 1.0f - saturate(p);
+
+    int i = 0;
+    for(; i < _ShadowCascadesCount; ++i)
     {
         float4 cullingSpheres = _CascadeCullingSpheres[i];
         if( Distance(cullingSpheres.xyz, positionWS) < cullingSpheres.w*cullingSpheres.w )
         {
-            index = i;
+            data.cascadeIndex = i;
             break;
         }
     }
-    return index;
+
+    if(data.cascadeIndex == _ShadowCascadesCount)
+    {
+        data.strength = 0.0f;
+    }
+
+    return data;
 }
 
-float3 TransformWorldToShadowCoord(int i, float3 positionWS)
+float3 TransformWorldToShadowCoord(int lightIndex,int cascadeIndex, float3 positionWS)
 {
-    int j = FindCascadeIndex(positionWS);
-    float4x4 mat = _DirectionalShadowMatrixs[i*MAX_CASCADE_COUNT + j];
+    // int j = FindCascadeIndex(positionWS);
+    float4x4 mat = _DirectionalShadowMatrixs[ lightIndex*MAX_CASCADE_COUNT + cascadeIndex];
     return mul(mat, float4(positionWS, 1)).xyz;
 }
 
