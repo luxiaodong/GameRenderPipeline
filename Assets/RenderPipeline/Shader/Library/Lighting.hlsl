@@ -31,7 +31,10 @@ float3 brdf_direct(int i, Light light, SurfaceData surfaceData, InputData inputD
     float ndotl = saturate(dot(inputData.normalWS, light.direction));
     float3 color = brdfData.diffuse + specularTerm * brdfData.specular;
 
-    float3 positionWS = inputData.positionWS;// + inputData.normalWS * light.shadowBias;
+    float3 deltWS = 0;
+    deltWS += light.direction * light.shadowBias;
+    deltWS += inputData.normalWS * light.shadowNormalBias * (1.0f - ndotl);
+    float3 positionWS = inputData.positionWS + deltWS;
 
     ShadowData shadowData = GetShadowData(positionWS);
     float attenuation = 1.0f;

@@ -19,8 +19,8 @@ MonoBehaviour:
       m_shadowMapSize: 1024
       m_cascadeCount: 4
       m_cascadeRatio1: 0.279
-      m_cascadeRatio2: 0.398
-      m_cascadeRatio3: 0.851
+      m_cascadeRatio2: 0.472
+      m_cascadeRatio3: 0.777
   m_enableDynamicBatching: 0
   m_enableGPUInstance: 0
   m_enableSRPBatcher: 0

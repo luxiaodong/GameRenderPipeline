@@ -32,6 +32,7 @@ Light GetDirectionalLight(int index)
     light.color = _DirectionalLightColors[index];
     light.shadowStrength = _LightShadowDatas[index].x;
     light.shadowBias = _LightShadowDatas[index].y;
+    light.shadowNormalBias = _LightShadowDatas[index].z;
     return light;
 }
 
