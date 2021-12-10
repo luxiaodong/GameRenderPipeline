@@ -127,23 +127,17 @@ public class GShadow
             proj.m23 = -proj.m23;
         }
 
-        float s = 1.0f/cascadeSplitCount;
-        Matrix4x4 cascade = Matrix4x4.identity;
-        cascade.SetColumn(0, new Vector4(s, 0, 0, 0));
-        cascade.SetColumn(1, new Vector4(0, s, 0, 0));
-        cascade.SetColumn(2, new Vector4(0, 0, 1, 0));
-        cascade.SetColumn(3, new Vector4(cascadeOffset.x*s, cascadeOffset.y*s, 0, 1));
+        float s1 = 1.0f/splitCount;
+        float s2 = 1.0f/cascadeSplitCount;
 
-        // Debug.Log("cascade is \n" + cascade);
+        float dx = tileOffset.x*s1 + cascadeOffset.x*s2*s1;
+        float dy = tileOffset.y*s1 + cascadeOffset.y*s2*s1;
 
-        s = 1.0f/splitCount;
         Matrix4x4 tile = Matrix4x4.identity;
-        tile.SetColumn(0, new Vector4(s, 0, 0, 0));
-        tile.SetColumn(1, new Vector4(0, s, 0, 0));
+        tile.SetColumn(0, new Vector4(s1*s2, 0, 0, 0));
+        tile.SetColumn(1, new Vector4(0, s1*s2, 0, 0));
         tile.SetColumn(2, new Vector4(0, 0, 1, 0));
-        tile.SetColumn(3, new Vector4(tileOffset.x*s, tileOffset.y*s, 0, 1));
-
-        // Debug.Log("tile is \n" + tile);
+        tile.SetColumn(3, new Vector4(dx, dy, 0, 1));
 
         Matrix4x4 clip = Matrix4x4.identity;
         clip.SetColumn(0, new Vector4(0.5f, 0, 0, 0));
@@ -151,7 +145,7 @@ public class GShadow
         clip.SetColumn(2, new Vector4(0, 0, 0.5f, 0));
         clip.SetColumn(3, new Vector4(0.5f, 0.5f, 0.5f, 1));
 
-        return cascade * tile * clip * proj * view;
+        return  tile * clip * proj * view;
     }
 
     public void SendShadowDataToShader()
