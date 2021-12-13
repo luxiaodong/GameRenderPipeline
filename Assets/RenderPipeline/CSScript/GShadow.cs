@@ -24,6 +24,14 @@ public class GShadow
     static int m_cascadeCullingSpheresPropertyId = Shader.PropertyToID("_CascadeCullingSpheres");
     // static int m_shadowDistancePropertyId = Shader.PropertyToID("_ShadowDistance");
     static int m_shadowDistanceFadePropertyId = Shader.PropertyToID("_ShadowDistanceFade");
+    static int m_shadowMapSizePropertyId = Shader.PropertyToID("_ShadowMapSize");
+
+    static string[] m_pcfFilterKeywords = {
+        "_PCF_FILTER_NONE",
+        "_PCF_FILTER_3X3",
+        "_PCF_FILTER_5X5",
+        "_PCF_FILTER_7X7",
+    };
 
     const int m_maxDirectionalLightShadowCount = 4;
     int m_directionalLightShadowCount = 0;
@@ -160,6 +168,28 @@ public class GShadow
         m_buffer.SetGlobalMatrixArray(m_directionalShadowMatrixsPropertyId, m_directionalShadowMatrixs);
         m_buffer.SetGlobalInt(m_shadowCascadesCountPropertyId, m_shadowCascadeCount);
         m_buffer.SetGlobalVectorArray(m_cascadeCullingSpheresPropertyId, m_cascadeCullingSpheres);
+
+        int shadowMapSize = (int)m_shadowSetting.m_directional.m_shadowMapSize;
+        Vector4 mapSize = new Vector4(1.0f/shadowMapSize, 1.0f/shadowMapSize, shadowMapSize, shadowMapSize);
+        m_buffer.SetGlobalVector(m_shadowMapSizePropertyId, mapSize);
+
+// _ShadowMapSize
+        SetKeywords(m_pcfFilterKeywords, (int)m_shadowSetting.m_directional.m_pcfFilter);
+    }
+
+    public void SetKeywords(string[] keywords, int index)
+    {
+        for(int i = 0; i < keywords.Length; ++i)
+        {
+            if (i == index)
+            {
+                m_buffer.EnableShaderKeyword(keywords[i]);
+            }
+            else
+            {
+                m_buffer.DisableShaderKeyword(keywords[i]);
+            }
+        }
     }
 
     public void Clear()

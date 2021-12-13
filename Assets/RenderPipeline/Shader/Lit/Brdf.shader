@@ -33,6 +33,7 @@
 
             #pragma shader_feature _CLIPPING
             #pragma shader_feature _PREMULTIPLY_ALPHA
+            #pragma multi_compile _PCF_FILTER_NONE _PCF_FILTER_3X3 _PCF_FILTER_5X5 _PCF_FILTER_7X7
 
             #include "../Library/Lighting.hlsl"
             TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);

@@ -8,7 +8,7 @@ public class ShadowSettings {
 	}
 
 	public enum FilterMode {
-		PCF2x2, PCF3x3, PCF5x5, PCF7x7
+		PCF_NONE, PCF3x3, PCF5x5, PCF7x7
 	}
 
 	[Min(0.001f)]
@@ -22,7 +22,7 @@ public class ShadowSettings {
 
 		public ShadowMapSize m_shadowMapSize;
 
-		// public FilterMode filter;
+		public FilterMode m_pcfFilter;
 
 		[Range(1, 4)]
 		public int m_cascadeCount;
@@ -45,7 +45,7 @@ public class ShadowSettings {
 
 	public Directional m_directional = new Directional {
 		m_shadowMapSize = ShadowMapSize._1024,
-		// filter = FilterMode.PCF2x2,
+		m_pcfFilter = FilterMode.PCF_NONE,
 		m_cascadeCount = 4,
 		m_cascadeRatio1 = 0.1f,
 		m_cascadeRatio2 = 0.25f,
