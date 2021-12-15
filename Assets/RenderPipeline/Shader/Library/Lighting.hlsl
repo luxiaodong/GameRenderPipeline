@@ -27,7 +27,7 @@ float3 brdf_direct(int i, Light light, SurfaceData surfaceData, InputData inputD
 
     if(preMultiAlpha) brdfData.diffuse *= surfaceData.alpha;
 
-    float3 specularTerm = GetBrdf(inputData.normalWS, light.direction, inputData.viewDirectionWS, brdfData.roughness, brdfData.specular);
+    float3 specularTerm = GetUnityBrdf(inputData.normalWS, light.direction, inputData.viewDirectionWS, brdfData.roughness, brdfData.specular);
     float ndotl = saturate(dot(inputData.normalWS, light.direction));
     float3 color = brdfData.diffuse + specularTerm * brdfData.specular;
 

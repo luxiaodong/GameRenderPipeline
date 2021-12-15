@@ -53,6 +53,24 @@ float3 GetBrdf(float3 n, float3 l, float3 v, float r, float3 f0)
     float ndotv = saturate(dot(n, v));
     float denom = 4.0*ndotl*ndotv + 0.00001f;
     return d*g*f/denom;
-} 
+}
+
+// http://www.thetenthplanet.de/archives/255
+float GetFactorVF(float3 l, float3 h, float r)
+{
+    //V * F = 1.0 / ( LoH^2 * (roughness + 0.5) )
+    // See "Optimizing PBR for Mobile" from Siggraph 2015 moving mobile graphics course
+    // https://community.arm.com/events/1155
+    float ldoth = saturate(dot(l, h));
+    float ldoth2 = max(0.1h, ldoth*ldoth);
+    float denom = ldoth2*(r + 0.5f);
+    return 1.0/denom;
+}
+
+float3 GetUnityBrdf(float3 n, float3 l, float3 v, float r, float3 f0)
+{
+    float3 h = SafeNormalize(l+v);
+    return GetFactorD(n,h,r)*GetFactorVF(l,h,r)/4.0f;
+}
 
 #endif
