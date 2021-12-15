@@ -17,11 +17,11 @@ MonoBehaviour:
     m_fadePercent: 0.8
     m_directional:
       m_shadowMapSize: 1024
-      m_pcfFilter: 3
+      m_pcfFilter: 0
       m_cascadeCount: 1
-      m_cascadeRatio1: 0.279
-      m_cascadeRatio2: 0.472
-      m_cascadeRatio3: 0.777
+      m_cascadeRatio1: 0.366
+      m_cascadeRatio2: 0.559
+      m_cascadeRatio3: 0.734
   m_enableDynamicBatching: 0
   m_enableGPUInstance: 0
   m_enableSRPBatcher: 0
