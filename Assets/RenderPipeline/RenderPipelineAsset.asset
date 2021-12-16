@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RenderPipelineAsset
   m_EditorClassIdentifier: 
   m_shadowSetting:
-    m_maxDistance: 14
+    m_maxDistance: 30
     m_fadePercent: 0.8
     m_directional:
       m_shadowMapSize: 1024

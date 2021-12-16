@@ -38,21 +38,21 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18383858, g: 0.2285577, b: 0.30065897, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 11
-  m_GIWorkflowMode: 0
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
     m_IndirectOutputScale: 1
     m_AlbedoBoost: 1
     m_EnvironmentLightingMode: 0
-    m_EnableBakedLightmaps: 1
-    m_EnableRealtimeLightmaps: 1
+    m_EnableBakedLightmaps: 0
+    m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
     serializedVersion: 12
     m_Resolution: 2
@@ -1911,7 +1911,7 @@ Light:
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
-    m_Bias: 0.05
+    m_Bias: 0.03
     m_NormalBias: 0.33
     m_NearPlane: 0.1
     m_CullingMatrixOverride:
@@ -1957,13 +1957,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: -0.017152773, y: -0.3385946, z: 0.70689875, w: 0.6207687}
+  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1592331799}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 27.22, y: -30, z: 90}
+  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &718353920
 GameObject:
   m_ObjectHideFlags: 0
@@ -3001,13 +3001,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.34467426, y: 0.005630338, z: -0.0020692681, w: 0.93870324}
-  m_LocalPosition: {x: -0.61, y: 5.1, z: -6.91}
+  m_LocalRotation: {x: 0.4044492, y: -0.009610831, z: 0.004224886, w: 0.91450024}
+  m_LocalPosition: {x: 0.8695025, y: 9.188897, z: -8.136195}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 47.716, y: -1.206, z: -0.004}
 --- !u!1 &977074005
 GameObject:
   m_ObjectHideFlags: 0
@@ -3181,7 +3181,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1070353481
 Transform:
   m_ObjectHideFlags: 0
@@ -4448,7 +4448,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8cf3e2c1f29844b9d9e34067f59512d8, type: 2}
+  - {fileID: 2100000, guid: 2b3c153fe0e114ad69d166694dd84a4c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

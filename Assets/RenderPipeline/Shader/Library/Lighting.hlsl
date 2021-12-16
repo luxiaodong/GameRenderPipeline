@@ -73,4 +73,11 @@ float3 brdf_indirect(Light light, SurfaceData surfaceData, InputData inputData)
     // return _GlossyEnvironmentColor.rgb;
 }
 
+float3 shadow_attenuation(float3 positionWS)
+{
+    float3 shadowCoordWS = TransformWorldToShadowCoord(0, 0, positionWS);
+    float shadow = SampleDirectionalShadowMap(shadowCoordWS);
+    return shadow*float3(1,1,1);
+}
+
 #endif
